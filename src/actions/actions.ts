@@ -4,8 +4,8 @@ import { calculateUniversityScores } from "@/lib/calculators/scoreCalculator";
 import { allUniversities } from "@/lib/data/universities";
 import { env } from "process";
 
-const OLLAMA_HOST = env.OLLAMA_HOST || "http://10.64.101.147:11434";
-const OLLAMA_MODEL = env.OLLAMA_MODEL || 'llama4:16x17b'; // Change as needed
+const OLLAMA_HOST = env.OLLAMA_HOST;
+const OLLAMA_MODEL = env.OLLAMA_MODEL; // Change as needed
 
 
 function countTokens(text: string): number {
