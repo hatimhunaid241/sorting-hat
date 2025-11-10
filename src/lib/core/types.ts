@@ -1,4 +1,6 @@
-// Core types for the JUPAS scoring system
+﻿// Core types for the JUPAS scoring system
+
+export type University = "cuhk" | "hku" | "hkust" | "cityu" | "polyu" | "hkbu" | "lingnan" | "eduhk";
 
 export interface SubjectRequirement {
     subject: string; // Subject abbreviation (e.g., "ENG", "CHIN", "MATH")
@@ -7,91 +9,68 @@ export interface SubjectRequirement {
     alternatives?: string[]; // Alternative subjects that can fulfill this requirement
 }
 
-export interface ScoringFormula {
-    type: "BEST_N" | "CORE_PLUS_BEST" | "WEIGHTED" | "CUSTOM" | "TIERED_WEIGHTED";
-    parameters: {
-        // For BEST_N: take best N subjects
-        n?: number;
-
-        // For CORE_PLUS_BEST: required core subjects + best of remaining
-        coreSubjects?: string[]; // Required subject abbreviations
-        additionalBest?: number; // Number of additional best subjects
-
-        // For WEIGHTED: different weights for different subjects
-        weights?: Record<string, number>; // Subject abbreviation -> weight
-
-        // For TIERED_WEIGHTED: Different weights based on performance levels
-        tieredWeights?: {
-            [subject: string]: {
-                [grade: string]: number; // Grade -> multiplier
-            };
-        };
-
-        // For all types: subject pools and constraints
-        includedCategories?: ("A" | "B" | "C")[]; // Which categories can be included
-        excludedSubjects?: string[]; // Subjects that cannot be counted
-        maxFromCategory?: Record<"A" | "B" | "C", number>; // Max subjects from each category
-
-        // Special rules
-        allowM1M2Both?: boolean; // Can count both M1 and M2
-        categoryBCAsElective?: boolean; // Can Category B/C count as electives
-        maxCategoryBCSubjects?: number; // Max subjects from Categories B & C combined
-
-        // Advanced scoring rules (missing from current implementation)
-        languageBonus?: {
-            subject: string;
-            bonusPoints: number;
-            minGrade: string;
-        }; // Extra points for language subjects
-
-        mathsExtendedBonus?: {
-            bonusPoints: number; // Extra points for M1/M2
-            minGrade: string;
-        };
-
-        scienceGroupBonus?: {
-            subjects: string[]; // Science subjects that get bonus together
-            bonusPoints: number;
-            minSubjects: number; // Minimum science subjects needed
-        };
-
-        subjectCombinationBonus?: {
-            requiredSubjects: string[];
-            bonusPoints: number;
-            minGrades?: Record<string, string>;
-        }[];
-
-        // Grade conversion adjustments (some unis have different mappings)
-        customGradeMapping?: Record<string, number>;
-
-        // Minimum score requirements (beyond just grades)
-        minimumTotalScore?: number;
-
-        // Score capping (some subjects capped at certain scores)
-        scoreCaps?: Record<string, number>;
-
-        // Subject-specific requirements for scoring
-        mandatorySubjectsForScoring?: string[]; // Must be included in calculation
-
-        // Custom calculation function name for complex formulas
-        customCalculation?: string;
-    };
-    notes?: string[];
+export interface ProgrammeDetails {
+    id: string;
+    name: string;
+    faculty?: string;
+    degree?: string;
+    degreeType?: string; // e.g., "Single Degree Programme", "Double Degree Programme"
+    studyPeriod?: number; // Duration in years
+    description?: string;
 }
 
 export interface ProgrammeEntry {
-    programme: {
-        id: string;
-        name: string;
-        faculty?: string;
-        degree?: string;
-    };
-    scoringFormula: ScoringFormula;
-    minimumRequirements: SubjectRequirement[];
+    programmeDetails: ProgrammeDetails;
+    method?: string;
     expectedScore?: number;
-    competitiveScore?: number; // Typical score for competitive admission
     otherRequirements?: string[];
-    interviewRequired?: boolean;
-    portfolioRequired?: boolean;
-    aptitudeTestRequired?: boolean;
+    calculation?: {
+        conditions: {
+            subject?: string;
+            variable?: string;
+            minGrade?: string;
+            multiplier?: number;
+            grade?: string;
+            required?: boolean;
+            includeCategories?: string[];
+            excludeSubCategories?: string[];
+            excludeSubjects?: string[];
+            includeAdditionalSubjects?: string[];
+        }[];
+        specificSubjectWeighting?: {
+            [subject: string]: number;
+        };
+    }
+}
+
+export type ScoreConversion = {
+    [university in University]: {
+        [category: string]: {
+            [subject: string]: {
+                [grade: string]: number; // Grade -> score
+            };
+        };
+    };
+};
+
+export interface StudentSubject {
+    id?: number;
+    uuid: string;
+    category: string;
+    subCategory: string;
+    subject: string;
+    abbreviation: string | string[];
+    grade: string;
+}
+
+export interface ScoreBreakdown {
+    subject: string;
+    score: number;
+}
+
+export interface ProgrammeScore {
+    programme: ProgrammeDetails;
+    university: University;
+    score: number;
+    scoreBreakdown: ScoreBreakdown[];
 }

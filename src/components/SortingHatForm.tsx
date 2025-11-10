@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 import { useEffect, useState, useRef } from "react";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "./ui/tooltip";
 import { Card, CardContent } from "./ui/card";
@@ -17,16 +17,231 @@ import {
   careers,
   csdGrades,
   disciplines,
-  grades,
+  categoryAGrades,
   interests,
   mbti,
-  universities,
   years,
+  categoryBGrades,
+  categoryCGrades,
+  koreanGrades,
+  japaneseGrades,
 } from "@/lib/data/subjects/constants";
 import { filteredSubjects } from "@/lib/data/subjects/subjects";
+import { StudentSubject, University } from "@/lib";
 
 function ErrorMessage({ message }: { message: string }) {
   return <p className="text-red-600 text-sm">{message}</p>;
+}
+
+const universityInfo: Record<string, { name: string; abbr: string }> = {
+  hku: { name: 'The University of Hong Kong', abbr: 'HKU' },
+  cuhk: { name: 'The Chinese University of Hong Kong', abbr: 'CUHK' },
+  hkust: { name: 'The Hong Kong University of Science and Technology', abbr: 'HKUST' },
+  cityu: { name: 'City University of Hong Kong', abbr: 'CityU' },
+  polyu: { name: 'The Hong Kong Polytechnic University', abbr: 'PolyU' },
+  hkbu: { name: 'Hong Kong Baptist University', abbr: 'HKBU' },
+  lingnan: { name: 'Lingnan University', abbr: 'LU' },
+  eduhk: { name: 'The Education University of Hong Kong', abbr: 'EdUHK' },
+};
+
+function ScoreBreakdownTabs({ 
+  calculatedScores, 
+  selectedUniversities 
+}: { 
+  calculatedScores: Record<string, Array<{
+    programme: {
+      programmeDetails: {
+        id: string;
+        name: string;
+        faculty?: string;
+      };
+      expectedScore?: number;
+      method?: string;
+    };
+    totalScore: number;
+    csdStatus: string;
+    breakdown: Array<{
+      subject: string;
+      abbreviation: string;
+      grade: string;
+      rawScore: number;
+      calculatedScore: number;
+      variable?: string;
+    }>;
+    comments: Array<{
+      message: string;
+      type: 'error' | 'warning' | 'info';
+    }>;
+  }>>; 
+  selectedUniversities: University[] 
+}) {
+  const [activeTab, setActiveTab] = useState<string>(selectedUniversities[0] || 'hku');
+
+  const getCommentColor = (type: 'error' | 'warning' | 'info') => {
+    switch (type) {
+      case 'error':
+        return 'text-red-600 bg-red-50 border-red-200';
+      case 'warning':
+        return 'text-yellow-700 bg-yellow-50 border-yellow-200';
+      case 'info':
+        return 'text-blue-600 bg-blue-50 border-blue-200';
+      default:
+        return 'text-gray-600 bg-gray-50 border-gray-200';
+    }
+  };
+
+  type BreakdownItem = {
+    subject: string;
+    abbreviation: string;
+    grade: string;
+    rawScore: number;
+    calculatedScore: number;
+    variable?: string;
+  };
+
+  const formatBreakdown = (breakdown: BreakdownItem[]) => {
+    return breakdown.map((item, idx) => {
+      const subjectInfo = `${item.subject} [${item.grade}]`;
+      const label = item.variable || item.abbreviation;
+      
+      return (
+        <div key={idx} className="mb-1">
+          <span className="font-semibold">{label}</span>
+          {' '}({item.calculatedScore.toFixed(1)}): {subjectInfo}
+          {item.rawScore !== undefined && (
+            <span className="text-gray-600 text-sm ml-1">
+              [raw: {item.rawScore.toFixed(1)}]
+            </span>
+          )}
+        </div>
+      );
+    });
+  };
+
+  return (
+    <div>
+      <div className="border-b border-gray-200 mb-4">
+        <div className="flex flex-wrap gap-2">
+          {selectedUniversities.map((uni) => (
+            <button
+              key={uni}
+              onClick={(e) => {e.preventDefault(); setActiveTab(uni)}}
+              className={`px-4 py-2 font-medium transition-colors ${
+                activeTab === uni
+                  ? 'border-b-2 border-blue-500 text-blue-600'
+                  : 'text-gray-600 hover:text-gray-900'
+              }`}
+            >
+              {universityInfo[uni]?.abbr || uni.toUpperCase()}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow">
+        <div className="p-6">
+          <h3 className="text-xl font-bold mb-4">
+            {universityInfo[activeTab]?.name || activeTab.toUpperCase()}
+          </h3>
+
+          {calculatedScores[activeTab] && calculatedScores[activeTab].length > 0 ? (
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse">
+                <thead>
+                  <tr className="bg-gray-50 border-b-2 border-gray-200">
+                    <th className="text-left p-3 font-semibold">Programme</th>
+                    <th className="text-left p-3 font-semibold w-32">Total Score</th>
+                    <th className="text-left p-3 font-semibold">Score Breakdown</th>
+                    <th className="text-left p-3 font-semibold">Comments</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {calculatedScores[activeTab].map((programmeResult, idx: number) => (
+                    <tr
+                      key={idx}
+                      className="border-b border-gray-200 hover:bg-gray-50"
+                    >
+                      <td className="p-3 align-top">
+                        <div>
+                          <div className="font-semibold text-gray-900">
+                            {programmeResult.programme.programmeDetails.id}
+                          </div>
+                          {programmeResult.programme.programmeDetails.name && (
+                            <div className="text-sm text-gray-700 mt-1">
+                              {programmeResult.programme.programmeDetails.name}
+                            </div>
+                          )}
+                          {programmeResult.programme.programmeDetails.faculty && (
+                            <div className="text-sm text-gray-600 mt-1">
+                              {programmeResult.programme.programmeDetails.faculty}
+                            </div>
+                          )}
+                          <div className="text-xs text-gray-500 mt-1">
+                            CSD: {programmeResult.csdStatus}
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="p-3 align-top">
+                        <div className="text-2xl font-bold text-blue-600">
+                          {programmeResult.totalScore.toFixed(1)}
+                        </div>
+                        {programmeResult.programme.expectedScore && (
+                          <div className="text-sm text-gray-600 mt-1">
+                            Expected: {programmeResult.programme.expectedScore}
+                          </div>
+                        )}
+                      </td>
+
+                      <td className="p-3 align-top">
+                        <div className="text-sm">
+                          {programmeResult.breakdown.length > 0 ? (
+                            formatBreakdown(programmeResult.breakdown)
+                          ) : (
+                            <div className="text-gray-500 italic">
+                              No breakdown available
+                            </div>
+                          )}
+                        </div>
+                      </td>
+
+                      <td className="p-3 align-top">
+                        {programmeResult.comments.length > 0 ? (
+                          <div className="space-y-2">
+                            {programmeResult.comments.map((comment, cIdx: number) => (
+                              <div
+                                key={cIdx}
+                                className={`text-sm px-3 py-2 rounded border ${getCommentColor(
+                                  comment.type
+                                )}`}
+                              >
+                                <div className="font-semibold uppercase text-xs mb-1">
+                                  {comment.type}
+                                </div>
+                                <div>{comment.message}</div>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <div className="text-gray-500 italic text-sm">
+                            No comments
+                          </div>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          ) : (
+            <div className="text-center py-12 text-gray-500">
+              No programmes available for this university
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export default function SortingHatForm() {
@@ -36,53 +251,23 @@ export default function SortingHatForm() {
   const bSubjects = filteredSubjects("B");
   const cSubjects = filteredSubjects("C");
 
+  const universities = ["HKU", "CUHK", "PolyU", "CityU", "HKBU", "Lingnan", "EduHK", "HKUST"];
+
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<{
     career: string;
     otherCareer: string;
     universityPreference: boolean;
-    universities: string[];
+    universities: University[];
     disciplinePreference: boolean;
     disciplines: string[];
     interests: string[];
     otherInterests: string;
     currentYear: string;
-    subjectsCore: {
-      id?: number;
-      uuid: string;
-      category: string;
-      subCategory: string;
-      subject: string;
-      abbreviation: string | string[];
-      grade: string;
-    }[];
-    subjectsElective: {
-      id?: number;
-      uuid: string;
-      category?: string;
-      subCategory?: string;
-      subject: string;
-      abbreviation?: string | string[];
-      grade: string;
-    }[];
-    subjectsB: {
-      id?: number;
-      uuid: string;
-      category?: string;
-      subCategory?: string;
-      subject: string;
-      abbreviation?: string | string[];
-      grade: string;
-    }[];
-    subjectsC: {
-      id?: number;
-      uuid: string;
-      category?: string;
-      subCategory?: string;
-      subject: string;
-      abbreviation?: string | string[];
-      grade: string;
-    }[];
+    subjectsCore: StudentSubject[];
+    subjectsElective: StudentSubject[];
+    subjectsB: StudentSubject[];
+    subjectsC: StudentSubject[];
     personalityType: string;
     additionalNotes: string;
   }>({
@@ -121,7 +306,7 @@ export default function SortingHatForm() {
     disciplines: "Please select at least one discipline or choose no preference",
     interests: "Please select at least one interest or hobby",
     currentYear: "Please select your current year of study",
-    subjectsCore: "Please select at least one subject and its grade",
+    subjectsCore: "",
     subjectsElective: "",
     subjectsB: "",
     subjectsC: "",
@@ -130,6 +315,7 @@ export default function SortingHatForm() {
   });
   const [data, setData] = useState<null | State>(null);
   const [showErrors, setShowErrors] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   const addSubject = (e: React.MouseEvent<HTMLButtonElement>, category: "A" | "B" | "C") => {
     e.preventDefault();
@@ -192,7 +378,7 @@ export default function SortingHatForm() {
     console.log("Subject deleted from category ", category, " at index ", index);
   };
 
-  const handleUniversityChange = (university: string) => {
+  const handleUniversityChange = (university: University) => {
     setForm((prev) => {
       const universities = prev.universities.includes(university)
         ? prev.universities.filter((item) => item !== university)
@@ -223,12 +409,36 @@ export default function SortingHatForm() {
     e.preventDefault();
     setShowErrors(true);
     if (error()) return;
+    
     setLoading(true);
-    const response = await submitSortingHatForm(form);
-    setData(response);
-    setLoading(false);
-    if (generatedContentRef.current) {
-      generatedContentRef.current.scrollIntoView({ behavior: "smooth" });
+    setSubmitError(null); // Clear any previous errors
+    
+    try {
+      const response = await submitSortingHatForm(form);
+      
+      if (!response) {
+        throw new Error("No response received from the server");
+      }
+      
+      if (!response.success) {
+        throw new Error(response.message || "Failed to generate recommendations");
+      }
+      
+      setData(response);
+      
+      // Scroll to results
+      if (generatedContentRef.current) {
+        generatedContentRef.current.scrollIntoView({ behavior: "smooth" });
+      }
+    } catch (err) {
+      console.error("Error submitting form:", err);
+      const errorMessage = err instanceof Error ? err.message : "An unexpected error occurred. Please try again.";
+      setSubmitError(errorMessage);
+      
+      // Scroll to show the error
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -277,14 +487,9 @@ export default function SortingHatForm() {
   }, [form.currentYear]);
 
   useEffect(() => {
-    let error = "";
-    if (
-      form.subjectsCore.length === 0 ||
-      form.subjectsCore.some((subj) => !subj.subject || !subj.grade)
-    ) {
-      error = "Please select at least one subject and its grade";
-    }
-    setErrors((prev) => ({ ...prev, subjectsCore: error }));
+    // Grades are now optional - no validation needed for grades
+    // Students without grades yet (younger students) can still use the system
+    setErrors((prev) => ({ ...prev, subjectsCore: "" }));
   }, [form.subjectsCore, form.subjectsElective, form.subjectsB, form.subjectsC]);
 
   useEffect(() => {
@@ -362,8 +567,8 @@ export default function SortingHatForm() {
                       }
                     `}>
                     <Checkbox
-                      checked={form.universities.includes(u)}
-                      onCheckedChange={() => handleUniversityChange(u)}
+                      checked={form.universities.includes(u.toLowerCase() as University)}
+                      onCheckedChange={() => handleUniversityChange(u.toLowerCase() as University)}
                       disabled={!form.universityPreference}
                       value={u}
                       name="universities"
@@ -479,7 +684,7 @@ export default function SortingHatForm() {
                       <SelectContent>
                         {(subj.subject === "Citizenship and Social Development"
                           ? csdGrades
-                          : grades
+                          : categoryAGrades
                         ).map((g, i) => (
                           <SelectItem key={i} value={g}>
                             {g}
@@ -517,7 +722,7 @@ export default function SortingHatForm() {
                         <SelectValue placeholder="Grade" />
                       </SelectTrigger>
                       <SelectContent>
-                        {grades.map((g, i) => (
+                        {categoryAGrades.map((g, i) => (
                           <SelectItem key={i} value={g}>
                             {g}
                           </SelectItem>
@@ -569,7 +774,7 @@ export default function SortingHatForm() {
                         <SelectValue placeholder="Grade" />
                       </SelectTrigger>
                       <SelectContent>
-                        {grades.map((g, i) => (
+                        {categoryBGrades.map((g, i) => (
                           <SelectItem key={i} value={g}>
                             {g}
                           </SelectItem>
@@ -619,7 +824,14 @@ export default function SortingHatForm() {
                         <SelectValue placeholder="Grade" />
                       </SelectTrigger>
                       <SelectContent>
-                        {grades.map((g, i) => (
+                        {(subj.subject === "Korean"
+                          ? koreanGrades
+                          : subj.subject === "Japanese"
+                          ? japaneseGrades
+                          : subj.subject === ""
+                          ? []
+                          : categoryCGrades
+                        ).map((g, i) => (
                           <SelectItem key={i} value={g}>
                             {g}
                           </SelectItem>
@@ -686,23 +898,67 @@ export default function SortingHatForm() {
               {showErrors && error() && (
                 <ErrorMessage message="Please fix the errors above before submitting." />
               )}
+              {submitError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0">
+                      <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                        <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                      </svg>
+                    </div>
+                    <div className="ml-3">
+                      <h3 className="text-sm font-medium text-red-800">Error Generating Recommendations</h3>
+                      <div className="mt-2 text-sm text-red-700">
+                        <p>{submitError}</p>
+                      </div>
+                      <div className="mt-4">
+                        <button
+                          type="button"
+                          onClick={() => setSubmitError(null)}
+                          className="text-sm font-medium text-red-800 hover:text-red-900 underline"
+                        >
+                          Dismiss
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
             </CardContent>
           </Card>
           {data && (
-            <Card ref={generatedContentRef}>
-              <CardContent className="grid gap-4 pt-6">
-                <label className="font-bold">Recommendations</label>
-                {data.data.generatedText ? (
-                  <div className="text-sm">
-                    <ReactMarkdown>{data.data.generatedText}</ReactMarkdown>
+            <>
+              <Card ref={generatedContentRef}>
+                <CardContent className="grid gap-4 pt-6">
+                  <h2 className="text-2xl font-bold">AI Recommendations</h2>
+                  {data.data.generatedText ? (
+                    <div className="prose max-w-none">
+                      <ReactMarkdown>{data.data.generatedText}</ReactMarkdown>
+                    </div>
+                  ) : (
+                    <p className="text-gray-600">
+                      Generating recommendations...
+                    </p>
+                  )}
+                  <div className="mt-4 text-sm text-gray-500">
+                    <p>Generation Time: {data.data.totalExecutionTime.toFixed(2)}s</p>
+                    <p>Tokens: {data.data.numberOfTokens} ({data.data.speed.toFixed(2)} tokens/sec)</p>
                   </div>
-                ) : (
-                  <p className="text-gray-600">
-                    No recommendations yet. Please fill out the form above.
-                  </p>
-                )}
-              </CardContent>
-            </Card>
+                </CardContent>
+              </Card>
+
+              {data.hasGrades && data.calculatedScores && data.selectedUniversities && (
+                <Card>
+                  <CardContent className="pt-6">
+                    <h2 className="text-2xl font-bold mb-4">Detailed Score Breakdown</h2>
+                    <ScoreBreakdownTabs 
+                      calculatedScores={data.calculatedScores}
+                      selectedUniversities={data.selectedUniversities}
+                    />
+                  </CardContent>
+                </Card>
+              )}
+            </>
           )}
         </div>
       </TooltipProvider>

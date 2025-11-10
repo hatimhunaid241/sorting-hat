@@ -1,4 +1,4 @@
-interface Subject {
+﻿interface Subject {
     id?: number;
     category: string;
     subCategory: string;
@@ -376,7 +376,7 @@ const subjectsRaw: Subject[] = [
     {
         category: "B",
         subCategory: "Services",
-        subject: "Pâtisserie and Café Operations",
+        subject: "PÃ¢tisserie and CafÃ© Operations",
         abbreviation: "P&CO"
     },
     {
@@ -575,39 +575,41 @@ const subjectsRaw: Subject[] = [
         category: "C",
         subCategory: "Other Languages",
         subject: "French",
-        abbreviation: "FR"
+        abbreviation: "FRENCH"
     },
     {
         category: "C",
         subCategory: "Other Languages",
         subject: "German",
-        abbreviation: "GER"
+        abbreviation: "GERMAN"
     },
     {
         category: "C",
         subCategory: "Other Languages",
         subject: "Japanese",
-        abbreviation: "JPN"
+        abbreviation: "JAPANESE"
     },
     {
         category: "C",
         subCategory: "Other Languages",
         subject: "Korean",
-        abbreviation: "KOR"
+        abbreviation: "KOREAN"
     },
     {
         category: "C",
         subCategory: "Other Languages",
         subject: "Spanish",
-        abbreviation: "SPA"
+        abbreviation: "SPANISH"
     },
     {
         category: "C",
         subCategory: "Other Languages",
         subject: "Urdu",
-        abbreviation: "URD"
+        abbreviation: "URDU"
     }
 ];
+
+export const subjectCodes = subjectsRaw.map(subject => subject.abbreviation).flat();
 
 // Function to check for duplicate abbreviations
 const checkDuplicates = (subjects: Subject[]) => {

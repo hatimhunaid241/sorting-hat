@@ -1,95 +1,110 @@
-import { ProgrammeEntry } from '../../core/types';
+﻿import { ProgrammeEntry } from '../../core/types';
 
 export const cuhk: ProgrammeEntry[] = [
     {
-        programme: {
-            id: "4002",
-            name: "Medicine",
-            faculty: "Faculty of Medicine",
-            degree: "MBChB"
+        programmeDetails: {
+            id: "JS4006",
+            name: "Anthropology",
+            faculty: "Faculty of Arts",
         },
-        scoringFormula: {
-            type: "BEST_N",
-            parameters: {
-                n: 6,
-                includedCategories: ["A"],
-                // CUHK typically doesn't count Category B/C for Medicine
-            },
-            notes: ["Best 6 Category A subjects including 4 core subjects"]
-        },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "4" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "3" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "CHEM", minGrade: "4" },
-            { subject: "BIO", minGrade: "4" }
-        ],
-        expectedScore: 36,
-        competitiveScore: 39,
-        interviewRequired: true
-    },
-    {
-        programme: {
-            id: "4005",
-            name: "Quantitative Finance and Risk Management Science",
-            faculty: "Faculty of Science",
-            degree: "BSc"
-        },
-        scoringFormula: {
-            type: "WEIGHTED",
-            parameters: {
-                weights: {
-                    "MATH": 2.0,    // Double weight for Mathematics
-                    "MATH-M1": 2.0, // Double weight for M1
-                    "MATH-M2": 2.0, // Double weight for M2
-                    "ENG": 1.0,
-                    "CHIN": 1.0,
-                    "CSD": 1.0
-                },
-                includedCategories: ["A", "B", "C"],
-                maxCategoryBCSubjects: 1
-            },
-            notes: [
-                "Mathematics subjects carry double weight",
-                "Best 6 subjects with Mathematics emphasis"
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
             ]
         },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "3" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "MATH-M1", minGrade: "3", alternatives: ["MATH-M2"] }
-        ],
-        expectedScore: 30,
-        competitiveScore: 35
+        expectedScore: 22.5,
+        otherRequirements: ["The programme will accept ¡°Attained with Distinction I or II¡± in Applied Learning subjects as extra elective subject for awarding bonus points. Please refer to https://www.cuhk.edu.hk/adm/jupas/ApL for details."]
     },
     {
-        programme: {
-            id: "4110",
-            name: "Business Administration",
-            faculty: "Faculty of Business Administration",
-            degree: "BBA"
+        programmeDetails: {
+            id: "JS4018",
+            name: "Chinese Language and Literature",
+            faculty: "Faculty of Arts",
         },
-        scoringFormula: {
-            type: "BEST_N",
-            parameters: {
-                n: 6,
-                includedCategories: ["A", "B", "C"],
-                maxCategoryBCSubjects: 2
-            },
-            notes: ["Best 6 subjects including core subjects"]
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "CHIN": 1.2,
+            }
         },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "2" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "ELECTIVE1", minGrade: "3" },
-            { subject: "ELECTIVE2", minGrade: "3" }
-        ],
-        expectedScore: 28,
-        competitiveScore: 31
-    }
+        expectedScore: 27,
+        otherRequirements: ["The programme will accept ¡°Attained with Distinction I or II¡± in Applied Learning subjects as extra elective subject for awarding bonus points. Please refer to https://www.cuhk.edu.hk/adm/jupas/ApL for details.", "The programme does not accept application for waiver of Chinese Language requirement."]
+    },
+    {
+        programmeDetails: {
+            id: "JS4032",
+            name: "English",
+            faculty: "Faculty of Arts",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "ENG": 1.5,
+            }
+        },
+        expectedScore: 25,
+        otherRequirements: ["Literature in English is preferred", "The programme will accept ¡°Attained with Distinction I or II¡± in Applied Learning subjects as extra elective subject for awarding bonus points. Please refer to https://www.cuhk.edu.hk/adm/jupas/ApL for details."]
+    },
+    {
+        programmeDetails: {
+            id: "JS4044",
+            name: "Fine Arts",
+            faculty: "Faculty of Arts",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ]
+        },
+        expectedScore: 21,
+        otherRequirements: ["Visual Arts is preferred", "The programme will accept ¡°Attained with Distinction I or II¡± in Applied Learning subjects as extra elective subject for awarding bonus points. Please refer to https://www.cuhk.edu.hk/adm/jupas/ApL for details."]
+    },
+    {
+        programmeDetails: {
+            id: "JS4056",
+            name: "History",
+            faculty: "Faculty of Arts",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ]
+        },
+        expectedScore: 23.5,
+        otherRequirements: ["The programme will accept ¡°Attained with Distinction I or II¡± in Applied Learning subjects as extra elective subject for awarding bonus points. Please refer to https://www.cuhk.edu.hk/adm/jupas/ApL for details."]
+    },
 ];

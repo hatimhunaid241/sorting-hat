@@ -1,114 +1,113 @@
-import { ProgrammeEntry } from '../../core/types';
+﻿import { ProgrammeEntry } from '../../core/types';
 
-export const cityU: ProgrammeEntry[] = [
+export const cityu: ProgrammeEntry[] = [
     {
-        programme: {
-            id: "1132",
-            name: "Bachelor of Engineering in Computer Science",
-            faculty: "College of Engineering",
-            degree: "BEng"
+        programmeDetails: {
+            id: "JS1000",
+            name: "BSc Computational Finance and Financial Technology",
+            faculty: "College of Business",
         },
-        scoringFormula: {
-            type: "TIERED_WEIGHTED",
-            parameters: {
-                tieredWeights: {
-                    // CityU gives extra weight for higher mathematics grades
-                    "MATH": {
-                        "5**": 2.0,
-                        "5*": 1.8,
-                        "5": 1.5,
-                        "4": 1.2,
-                        "3": 1.0
-                    },
-                    "MATH-M1": {
-                        "5**": 2.0,
-                        "5*": 1.8,
-                        "5": 1.5,
-                        "4": 1.2,
-                        "3": 1.0
-                    },
-                    "PHY": {
-                        "5**": 1.5,
-                        "5*": 1.3,
-                        "5": 1.2,
-                        "4": 1.1,
-                        "3": 1.0
-                    }
-                },
-                mathsExtendedBonus: {
-                    bonusPoints: 0.5, // Extra 0.5 points for M1/M2
-                    minGrade: "3"
-                },
-                includedCategories: ["A", "B"],
-                maxCategoryBCSubjects: 1
-            },
-            notes: [
-                "Tiered weighting: Higher grades in MATH/PHY get additional multipliers",
-                "M1/M2 subjects receive bonus points"
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
             ]
         },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "3" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "PHY", minGrade: "3", alternatives: ["CHEM", "BIO", "MATH-M1", "MATH-M2"] },
-            { subject: "ELECTIVE1", minGrade: "3" }
-        ],
-        expectedScore: 30,
-        competitiveScore: 35
+        expectedScore: 24.5,
+        otherRequirements: [
+        ]
     },
     {
-        programme: {
-            id: "1110",
-            name: "Bachelor of Business Administration",
+        programmeDetails: {
+            id: "JS1001",
+            name: "BBA Global Business",
             faculty: "College of Business",
-            degree: "BBA"
         },
-        scoringFormula: {
-            type: "WEIGHTED",
-            parameters: {
-                weights: {
-                    "ENG": 1.5,  // English more important for business
-                    "CHIN": 1.2,
-                    "MATH": 1.3,
-                    "CSD": 1.0,
-                    "ECO": 1.4,  // Economics bonus
-                    "BAFS": 1.4, // Business subjects bonus
-                    "GEO": 1.1,
-                    "HIST": 1.1
-                },
-                languageBonus: {
-                    subject: "FR", // Foreign language bonus
-                    bonusPoints: 1.0,
-                    minGrade: "3"
-                },
-                subjectCombinationBonus: [
-                    {
-                        requiredSubjects: ["ECO", "BAFS"],
-                        bonusPoints: 2.0,
-                        minGrades: { "ECO": "3", "BAFS": "3" }
-                    }
-                ],
-                includedCategories: ["A", "B", "C"],
-                maxCategoryBCSubjects: 2
-            },
-            notes: [
-                "English and Mathematics carry extra weight",
-                "Economics and Business subjects receive bonus",
-                "Combination bonus for ECO + BAFS",
-                "Foreign languages receive bonus points"
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
             ]
         },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "2" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "ELECTIVE1", minGrade: "3" },
-            { subject: "ELECTIVE2", minGrade: "3" }
-        ],
-        expectedScore: 28,
-        competitiveScore: 32
-    }
+        expectedScore: 29,
+        otherRequirements: [
+        ]
+    },
+    {
+        programmeDetails: {
+            id: "JS1002",
+            name: "BBA Accountancy",
+            faculty: "College of Business",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ]
+        },
+        expectedScore: 20.5,
+        otherRequirements: [
+        ]
+    },
+    {
+        programmeDetails: {
+            id: "JS1005",
+            name: "BBA Management",
+            faculty: "College of Business",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ]
+        },
+        expectedScore: 20.5,
+        otherRequirements: [
+        ]
+    },
+    {
+        programmeDetails: {
+            id: "JS1007",
+            name: "BBA Marketing",
+            faculty: "College of Business",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "ENG": 1.5,
+            }
+        },
+        expectedScore: 23.5,
+        otherRequirements: [
+        ]
+    },
+
 ];

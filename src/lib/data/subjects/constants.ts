@@ -1,4 +1,4 @@
-export const careers = [
+﻿export const careers = [
     "No idea yet",
     "Doctor / Surgeon",
     "Engineer",
@@ -33,7 +33,6 @@ export const careers = [
     "Other",
 ];
 
-export const universities = ["HKU", "CUHK", "HKUST", "PolyU", "CityU", "EdUHK", "HKBU", "Lingnan"];
 export const disciplines = [
     "Engineering",
     "Arts & Humanities",
@@ -141,15 +140,9 @@ export const mbti = [
         desc: "Prefer not to say / Not sure",
     },
 ];
-export const grades = ["5**", "5*", "5", "4", "3", "2", "1", "U", "N/A"];
+export const categoryAGrades = ["5**", "5*", "5", "4", "3", "2", "1", "U", "N/A"];
 export const csdGrades = ["Attained", "Not Attained"];
-
-export const categoryScores = {
-    A: [
-        {
-            text: "5**",
-            score: 8.5,
-            bonusPercentage: 5
-        }
-    ]
-}
+export const categoryBGrades = ["Attained with Distinction (II)", "Attained with Distinction (I)", "Attained with Distinction", "Attained", "N/A"];
+export const categoryCGrades = ["C2", "C1", "B2", "B1", "A2", "N/A"];
+export const koreanGrades = ["Grade 6", "Grade 5", "Grade 4", "Grade 3", "N/A"]
+export const japaneseGrades = ["N1", "N2", "N3", "N/A"]

@@ -1,4 +1,4 @@
-// Main library exports
+﻿// Main library exports
 
 // Core types
 export * from './core/types';
@@ -6,11 +6,9 @@ export * from './core/types';
 // University data
 export * from './data/universities';
 
-// Calculators
-export * from './calculators/scoringCalculator';
+// TODO Calculators
 
 // Helpers and utilities
-export * from './helpers/universityUtils';
 export * from './helpers/utils';
 
 // Subject data

@@ -1,74 +1,113 @@
-import { ProgrammeEntry } from '../../core/types';
+﻿import { ProgrammeEntry } from '../../core/types';
 
-export const eduHK: ProgrammeEntry[] = [
+export const eduhk: ProgrammeEntry[] = [
     {
-        programme: {
-            id: "A2A001",
-            name: "Bachelor of Education (Honours) (Primary) - General Studies",
-            faculty: "Faculty of Education and Human Development",
-            degree: "BEd"
+        programmeDetails: {
+            id: "JS8001",
+            name: "BA in Creative and Digital Arts and BEd (Music)",
         },
-        scoringFormula: {
-            type: "CUSTOM",
-            parameters: {
-                customCalculation: "eduHK_primary_general",
-                includedCategories: ["A", "B", "C"],
-                maxCategoryBCSubjects: 2
-            },
-            notes: [
-                "Special calculation: Best 5 subjects with bonus points",
-                "Bonus for relevant subjects like Geography, History, Economics",
-                "Additional consideration for Category B subjects in education"
-            ]
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3", multiplier: 2 },
+                { subject: "CHIN", minGrade: "3", multiplier: 1 },
+                { subject: "MATH", minGrade: "2", multiplier: 1 },
+                { subject: "CSD", grade: "Attained", multiplier: 1 },
+                { variable: "BEST4", minGrade: "2", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "2", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "MUS": 1.5
+            }
         },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "2" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "ELECTIVE1", minGrade: "3" }
-        ],
-        expectedScore: 25,
-        competitiveScore: 28,
-        interviewRequired: true
+        otherRequirements: ["Satisfactory performance in an audition is required. Applicants who obtain Level 4 or above in HKDSE Music will be exempted from the audition"]
     },
     {
-        programme: {
-            id: "A2A012",
-            name: "Bachelor of Education (Honours) (Secondary) - Mathematics",
-            faculty: "Faculty of Education and Human Development",
-            degree: "BEd"
+        programmeDetails: {
+            id: "JS8002",
+            name: "BA in Creative and Digital Arts and BEd (Visual Arts)",
         },
-        scoringFormula: {
-            type: "WEIGHTED",
-            parameters: {
-                weights: {
-                    "MATH": 2.0,
-                    "MATH-M1": 2.0,
-                    "MATH-M2": 2.0,
-                    "PHY": 1.2,
-                    "CHEM": 1.1,
-                    "ENG": 1.0,
-                    "CHIN": 1.0,
-                    "CSD": 1.0
-                },
-                includedCategories: ["A", "B"],
-                maxCategoryBCSubjects: 1
-            },
-            notes: [
-                "Mathematics subjects carry double weight",
-                "Science subjects receive bonus weighting"
-            ]
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3", multiplier: 2 },
+                { subject: "CHIN", minGrade: "3", multiplier: 1 },
+                { subject: "MATH", minGrade: "2", multiplier: 1 },
+                { subject: "CSD", grade: "Attained", multiplier: 1 },
+                { variable: "BEST4", minGrade: "2", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "2", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "VA": 1.5
+            }
         },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "4" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "MATH-M1", minGrade: "3", alternatives: ["MATH-M2"] }
-        ],
-        expectedScore: 30,
-        competitiveScore: 35,
-        interviewRequired: true
-    }
+        otherRequirements: ["Satisfactory performance in a practical test is required. Applicants who obtain Level 4 or above in HKDSE Visual Arts will be exempted from the practical test."]
+    },
+    {
+        programmeDetails: {
+            id: "JS8003",
+            name: "BA in Digital Chinese Culture and Communication and BEd (Chinese Language)",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3", multiplier: 1.5 },
+                { subject: "CHIN", minGrade: "3", multiplier: 1.5 },
+                { subject: "MATH", minGrade: "2", multiplier: 1 },
+                { subject: "CSD", grade: "Attained", multiplier: 1 },
+                { variable: "BEST4", minGrade: "2", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "2", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "CHIN-LIT": 1.5,
+                "ICT": 1.5
+            }
+        },
+        otherRequirements: ["This programme requires high Chinese language proficiency. The HKDSE Chinese Language requirement cannot be substituted."]
+    },
+    {
+        programmeDetails: {
+            id: "JS8004",
+            name: "BA in English Studies and Digital Communication and BEd (English Language)",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "2", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "2", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "ENG": 1.5,
+                "LIT-ENG": 1.5,
+                "ICT": 1.5
+            }
+        },
+        otherRequirements: ["This programme requires high English language proficiency. The HKDSE English Language requirement cannot be substituted."]
+    },
+    {
+        programmeDetails: {
+            id: "JS8005",
+            name: "BA in in Heritage Education and Arts Management and BEd (Chinese History)",
+        },
+        method: "Best 5 Subjects",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "2", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "2", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "CHIN-HIST": 1.5,
+                "HIST": 1.5
+            }
+        },
+        otherRequirements: ["This programme requires high Chinese language proficiency. The HKDSE Chinese Language requirement cannot be substituted."]
+    },
 ];

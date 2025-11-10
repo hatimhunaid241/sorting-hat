@@ -1,135 +1,133 @@
-import type { ProgrammeEntry } from '../../core/types';
+﻿import type { ProgrammeEntry } from '../../core/types';
 
 export const hku: ProgrammeEntry[] = [
     {
-        programme: {
+        programmeDetails: {
             id: "6004",
             name: "Bachelor of Arts in Architectural Studies",
             faculty: "Faculty of Architecture",
-            degree: "BArch"
         },
-        scoringFormula: {
-            type: "BEST_N",
-            parameters: {
-                n: 5,
-                includedCategories: ["A", "B", "C"],
-                maxFromCategory: { "A": 5, "B": 1, "C": 1 },
-                categoryBCAsElective: true,
-                maxCategoryBCSubjects: 1
-            },
-            notes: ["Best 5 subjects including 4 core subjects and 1 elective"]
+        method: "Best 5 Subjects (May include M1/M2 or Category C subject whichever is higher)",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
         },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "2" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "ELECTIVE1", minGrade: "3" }, // Any Category A elective
-            { subject: "ELECTIVE2", minGrade: "3" }  // Any Category A elective or Category B/C
-        ],
         expectedScore: 26,
-        competitiveScore: 28,
-        aptitudeTestRequired: true,
+        otherRequirements: ["Candidates are required to take part in the Aptitude Exercise. Instructions for taking part in the Aptitude Exercise will be sent to all potential candidates via e-mail and posted on the programme website."]
+    },
+    {
+        programmeDetails: {
+            id: "6016",
+            name: "Bachelor of Science in Surveying",
+            faculty: "Faculty of Architecture",
+        },
+        method: "Best 5 Subjects (May include M1/M2 or Category C subject whichever is higher)",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ]
+        },
+        expectedScore: 27,
+        otherRequirements: []
+    },
+    {
+        programmeDetails: {
+            id: "6028",
+            name: "Bachelor of Arts in Landscape Studies",
+            faculty: "Faculty of Architecture",
+        },
+        method: "Best 5 Subjects (May include M1/M2 or Category C subject whichever is higher)",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ]
+        },
+        expectedScore: 24,
+        otherRequirements: ["Candidates are required to take part in the Creative Design Response. Instructions for taking part in the Creative Design Response will be sent to all potential candidates via e-mail and posted on the programme website.", "Candidates are strongly encouraged to show a portfolio of creative work (which may include drawing, painting, collage, sculpture, creative writing, video, multi-media work) during the interview."]
+    },
+    {
+        programmeDetails: {
+            id: "6042",
+            name: "Bachelor of Arts in Urban Studies",
+            faculty: "Faculty of Architecture",
+        },
+        method: "Best 5 Subjects (May include M1/M2 or Category C subject whichever is higher)",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ]
+        },
+        expectedScore: 24,
+        otherRequirements: ["Candidates are required to take part in the Creative Design Response. Instructions for taking part in the Creative Design Response will be sent to all potential candidates via e-mail and posted on the programme website.", "Candidates are strongly encouraged to show a portfolio of creative work (which may include drawing, painting, collage, sculpture, creative writing, video, multi-media work) during the interview."]
+    },
+    {
+        programmeDetails: {
+            id: "6236",
+            name: "Bachelor of Arts and Sciences in Design+",
+            faculty: "Faculty of Architecture",
+        },
+        method: "Best 5 Subjects (May include M1/M2 or Category C subject whichever is higher)",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "4" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ]
+        },
+        expectedScore: 27,
         otherRequirements: [
-            "Candidates are required to take part in the Aptitude Exercise. Instructions for taking part in the Aptitude Exercise will be sent to all potential candidates via e-mail and posted on the programme website."
+            "Candidates with level 4 in English Language, if admitted, will be required to take 6 additional credits in Core University English to complete their degree studies.",
+            "Candidates are required to submit at least one example of a creative work (fine art, writing, or other forms of creative output) for consideration."
         ]
     },
     {
-        programme: {
-            id: "6363",
-            name: "Bachelor of Business Administration",
-            faculty: "Faculty of Business and Economics",
-            degree: "BBA"
+        programmeDetails: {
+            id: "6054",
+            name: "Bachelor of Arts",
+            faculty: "Faculty of Arts",
         },
-        scoringFormula: {
-            type: "BEST_N",
-            parameters: {
-                n: 6,
-                includedCategories: ["A", "B", "C"],
-                maxFromCategory: { "A": 6, "B": 2, "C": 2 },
-                categoryBCAsElective: true,
-                maxCategoryBCSubjects: 2
-            },
-            notes: ["Best 6 subjects including 4 core subjects and 2 electives"]
+        method: "2x Eng + Best 4 Subjects (May include M1/M2 or Category C subject whichever is higher) with weightings (1.5x Chinese Language)",
+        calculation: {
+            conditions: [
+                { subject: "ENG", minGrade: "3" },
+                { subject: "CHIN", minGrade: "3" },
+                { subject: "MATH", minGrade: "2" },
+                { subject: "CSD", grade: "Attained" },
+                { variable: "BEST4", minGrade: "3", includeCategories: ["A"], excludeSubCategories: ["CORE"], excludeSubjects: ["MATH-M1", "MATH-M2"] },
+                { variable: "BEST5", minGrade: "3", includeCategories: ["A", "C"], excludeSubCategories: ["CORE"] },
+            ],
+            specificSubjectWeighting: {
+                "ENG": 2,
+                "CHIN": 1.5
+            }
         },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "2" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "ELECTIVE1", minGrade: "3" },
-            { subject: "ELECTIVE2", minGrade: "3" }
-        ],
-        expectedScore: 30,
-        competitiveScore: 33
+        expectedScore: 28,
+        otherRequirements: [
+            "Non-school candidates and candidates who have obtained level 3 in HKDSE English Language may be interviewed and will be considered on a case-by-case basis.",
+        ]
     },
-    {
-        programme: {
-            id: "6069",
-            name: "Bachelor of Medicine and Bachelor of Surgery",
-            faculty: "Li Ka Shing Faculty of Medicine",
-            degree: "MBBS"
-        },
-        scoringFormula: {
-            type: "CORE_PLUS_BEST",
-            parameters: {
-                coreSubjects: ["ENG", "CHIN", "MATH", "CSD"],
-                additionalBest: 2,
-                includedCategories: ["A"],
-                excludedSubjects: ["MATH-M1", "MATH-M2"] // Usually prefer science subjects
-            },
-            notes: [
-                "Best 6 subjects with emphasis on science subjects",
-                "Chemistry and Biology strongly preferred for electives"
-            ]
-        },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "4" },
-            { subject: "CHIN", minGrade: "4" },
-            { subject: "MATH", minGrade: "4" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "CHEM", minGrade: "4" },
-            { subject: "BIO", minGrade: "4", alternatives: ["PHY"] }
-        ],
-        expectedScore: 36,
-        competitiveScore: 40,
-        interviewRequired: true
-    },
-    {
-        programme: {
-            id: "6468",
-            name: "Bachelor of Engineering",
-            faculty: "Faculty of Engineering",
-            degree: "BEng"
-        },
-        scoringFormula: {
-            type: "WEIGHTED",
-            parameters: {
-                weights: {
-                    "ENG": 1.0,
-                    "CHIN": 1.0,
-                    "MATH": 1.5,  // Mathematics weighted more heavily
-                    "CSD": 1.0,
-                    "PHY": 1.2,   // Physics weighted more heavily
-                    "CHEM": 1.1   // Chemistry slightly weighted
-                },
-                includedCategories: ["A", "B", "C"],
-                maxCategoryBCSubjects: 1
-            },
-            notes: [
-                "Mathematics and Physics carry additional weight",
-                "Best 6 subjects with weighting applied"
-            ]
-        },
-        minimumRequirements: [
-            { subject: "ENG", minGrade: "3" },
-            { subject: "CHIN", minGrade: "3" },
-            { subject: "MATH", minGrade: "3" },
-            { subject: "CSD", minGrade: "A" },
-            { subject: "PHY", minGrade: "3", alternatives: ["CHEM", "BIO"] },
-            { subject: "ELECTIVE1", minGrade: "3" }
-        ],
-        expectedScore: 32,
-        competitiveScore: 35
-    }
 ]
