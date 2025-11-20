@@ -55,7 +55,7 @@ function ScoreBreakdownTabs({
         name: string;
         faculty?: string;
       };
-      expectedScore?: number;
+      expectedScore?: number | null;
       method?: string;
     };
     totalScore: number;
@@ -76,6 +76,8 @@ function ScoreBreakdownTabs({
   selectedUniversities: University[] 
 }) {
   const [activeTab, setActiveTab] = useState<string>(selectedUniversities[0] || 'hku');
+  const [currentPage, setCurrentPage] = useState<Record<string, number>>({});
+  const ITEMS_PER_PAGE = 5;
 
   const getCommentColor = (type: 'error' | 'warning' | 'info') => {
     switch (type) {
@@ -118,6 +120,98 @@ function ScoreBreakdownTabs({
     });
   };
 
+  // Get paginated programmes for current tab
+  const getPaginatedProgrammes = (programmes: Array<{
+    programme: {
+      programmeDetails: {
+        id: string;
+        name: string;
+        faculty?: string;
+      };
+      expectedScore?: number | null;
+      method?: string;
+    };
+    totalScore: number;
+    csdStatus: string;
+    breakdown: Array<{
+      subject: string;
+      abbreviation: string;
+      grade: string;
+      rawScore: number;
+      calculatedScore: number;
+      variable?: string;
+    }>;
+    comments: Array<{
+      message: string;
+      type: 'error' | 'warning' | 'info';
+    }>;
+  }>) => {
+    const page = currentPage[activeTab] || 1;
+    const startIndex = (page - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return programmes.slice(startIndex, endIndex);
+  };
+
+  const getTotalPages = (programmes: Array<{
+    programme: {
+      programmeDetails: {
+        id: string;
+        name: string;
+        faculty?: string;
+      };
+      expectedScore?: number | null;
+      method?: string;
+    };
+    totalScore: number;
+    csdStatus: string;
+    breakdown: Array<{
+      subject: string;
+      abbreviation: string;
+      grade: string;
+      rawScore: number;
+      calculatedScore: number;
+      variable?: string;
+    }>;
+    comments: Array<{
+      message: string;
+      type: 'error' | 'warning' | 'info';
+    }>;
+  }>) => {
+    return Math.ceil(programmes.length / ITEMS_PER_PAGE);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(prev => ({
+      ...prev,
+      [activeTab]: page
+    }));
+  };
+
+  // Get visible page numbers (show 5 at a time)
+  const getVisiblePages = (currentPageNum: number, totalPages: number) => {
+    const maxVisible = 5;
+    let start = Math.max(1, currentPageNum - Math.floor(maxVisible / 2));
+    const end = Math.min(totalPages, start + maxVisible - 1);
+    
+    // Adjust start if we're near the end
+    if (end - start + 1 < maxVisible) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+    
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  };
+
+  // Reset to page 1 when changing tabs
+  const handleTabChange = (uni: string) => {
+    setActiveTab(uni);
+    if (!currentPage[uni]) {
+      setCurrentPage(prev => ({
+        ...prev,
+        [uni]: 1
+      }));
+    }
+  };
+
   return (
     <div>
       <div className="border-b border-gray-200 mb-4">
@@ -125,7 +219,7 @@ function ScoreBreakdownTabs({
           {selectedUniversities.map((uni) => (
             <button
               key={uni}
-              onClick={(e) => {e.preventDefault(); setActiveTab(uni)}}
+              onClick={(e) => {e.preventDefault(); handleTabChange(uni)}}
               className={`px-4 py-2 font-medium transition-colors ${
                 activeTab === uni
                   ? 'border-b-2 border-blue-500 text-blue-600'
@@ -145,94 +239,168 @@ function ScoreBreakdownTabs({
           </h3>
 
           {calculatedScores[activeTab] && calculatedScores[activeTab].length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full border-collapse">
-                <thead>
-                  <tr className="bg-gray-50 border-b-2 border-gray-200">
-                    <th className="text-left p-3 font-semibold">Programme</th>
-                    <th className="text-left p-3 font-semibold w-32">Total Score</th>
-                    <th className="text-left p-3 font-semibold">Score Breakdown</th>
-                    <th className="text-left p-3 font-semibold">Comments</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {calculatedScores[activeTab].map((programmeResult, idx: number) => (
-                    <tr
-                      key={idx}
-                      className="border-b border-gray-200 hover:bg-gray-50"
-                    >
-                      <td className="p-3 align-top">
-                        <div>
-                          <div className="font-semibold text-gray-900">
-                            {programmeResult.programme.programmeDetails.id}
-                          </div>
-                          {programmeResult.programme.programmeDetails.name && (
-                            <div className="text-sm text-gray-700 mt-1">
-                              {programmeResult.programme.programmeDetails.name}
-                            </div>
-                          )}
-                          {programmeResult.programme.programmeDetails.faculty && (
-                            <div className="text-sm text-gray-600 mt-1">
-                              {programmeResult.programme.programmeDetails.faculty}
-                            </div>
-                          )}
-                          <div className="text-xs text-gray-500 mt-1">
-                            CSD: {programmeResult.csdStatus}
-                          </div>
-                        </div>
-                      </td>
-
-                      <td className="p-3 align-top">
-                        <div className="text-2xl font-bold text-blue-600">
-                          {programmeResult.totalScore.toFixed(1)}
-                        </div>
-                        {programmeResult.programme.expectedScore && (
-                          <div className="text-sm text-gray-600 mt-1">
-                            Expected: {programmeResult.programme.expectedScore}
-                          </div>
-                        )}
-                      </td>
-
-                      <td className="p-3 align-top">
-                        <div className="text-sm">
-                          {programmeResult.breakdown.length > 0 ? (
-                            formatBreakdown(programmeResult.breakdown)
-                          ) : (
-                            <div className="text-gray-500 italic">
-                              No breakdown available
-                            </div>
-                          )}
-                        </div>
-                      </td>
-
-                      <td className="p-3 align-top">
-                        {programmeResult.comments.length > 0 ? (
-                          <div className="space-y-2">
-                            {programmeResult.comments.map((comment, cIdx: number) => (
-                              <div
-                                key={cIdx}
-                                className={`text-sm px-3 py-2 rounded border ${getCommentColor(
-                                  comment.type
-                                )}`}
-                              >
-                                <div className="font-semibold uppercase text-xs mb-1">
-                                  {comment.type}
-                                </div>
-                                <div>{comment.message}</div>
-                              </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <div className="text-gray-500 italic text-sm">
-                            No comments
-                          </div>
-                        )}
-                      </td>
+            <>
+              <div className="overflow-x-auto">
+                <table className="w-full border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b-2 border-gray-200">
+                      <th className="text-left p-3 font-semibold">Programme</th>
+                      <th className="text-left p-3 font-semibold w-32">Total Score</th>
+                      <th className="text-left p-3 font-semibold">Score Breakdown</th>
+                      <th className="text-left p-3 font-semibold">Comments</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                  </thead>
+                  <tbody>
+                    {getPaginatedProgrammes(calculatedScores[activeTab]).map((programmeResult, idx: number) => (
+                      <tr
+                        key={idx}
+                        className="border-b border-gray-200 hover:bg-gray-50"
+                      >
+                        <td className="p-3 align-top">
+                          <div>
+                            <div className="font-semibold text-gray-900">
+                              {programmeResult.programme.programmeDetails.id}
+                            </div>
+                            {programmeResult.programme.programmeDetails.name && (
+                              <div className="text-sm text-gray-700 mt-1">
+                                {programmeResult.programme.programmeDetails.name}
+                              </div>
+                            )}
+                            {programmeResult.programme.programmeDetails.faculty && (
+                              <div className="text-sm text-gray-600 mt-1">
+                                {programmeResult.programme.programmeDetails.faculty}
+                              </div>
+                            )}
+                            <div className="text-xs text-gray-500 mt-1">
+                              CSD: {programmeResult.csdStatus}
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="p-3 align-top">
+                          <div className="text-2xl font-bold text-blue-600">
+                            {programmeResult.totalScore.toFixed(1)}
+                          </div>
+                          {programmeResult.programme.expectedScore && (
+                            <div className="text-sm text-gray-600 mt-1">
+                              Expected: {programmeResult.programme.expectedScore}
+                            </div>
+                          )}
+                        </td>
+
+                        <td className="p-3 align-top">
+                          <div className="text-sm">
+                            {programmeResult.breakdown.length > 0 ? (
+                              formatBreakdown(programmeResult.breakdown)
+                            ) : (
+                              <div className="text-gray-500 italic">
+                                No breakdown available
+                              </div>
+                            )}
+                          </div>
+                        </td>
+
+                        <td className="p-3 align-top">
+                          {programmeResult.comments.length > 0 ? (
+                            <div className="space-y-2">
+                              {programmeResult.comments.map((comment, cIdx: number) => (
+                                <div
+                                  key={cIdx}
+                                  className={`text-sm px-3 py-2 rounded border ${getCommentColor(
+                                    comment.type
+                                  )}`}
+                                >
+                                  <div className="font-semibold uppercase text-xs mb-1">
+                                    {comment.type}
+                                  </div>
+                                  <div>{comment.message}</div>
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-gray-500 italic text-sm">
+                              No comments
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+              
+              {/* Pagination */}
+              {getTotalPages(calculatedScores[activeTab]) > 1 && (
+                <div className="flex items-center justify-between mt-6">
+                  <div className="text-sm text-gray-600">
+                    Showing {((currentPage[activeTab] || 1) - 1) * ITEMS_PER_PAGE + 1} to{' '}
+                    {Math.min((currentPage[activeTab] || 1) * ITEMS_PER_PAGE, calculatedScores[activeTab].length)} of{' '}
+                    {calculatedScores[activeTab].length} programmes
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <button
+                      onClick={() => handlePageChange((currentPage[activeTab] || 1) - 1)}
+                      disabled={(currentPage[activeTab] || 1) <= 1}
+                      className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Previous
+                    </button>
+                    
+                    {/* Show ellipsis if there are pages before visible range */}
+                    {getVisiblePages(currentPage[activeTab] || 1, getTotalPages(calculatedScores[activeTab]))[0] > 1 && (
+                      <>
+                        <button
+                          onClick={() => handlePageChange(1)}
+                          className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 rounded-md"
+                        >
+                          1
+                        </button>
+                        {getVisiblePages(currentPage[activeTab] || 1, getTotalPages(calculatedScores[activeTab]))[0] > 2 && (
+                          <span className="px-2 py-2 text-sm text-gray-500">...</span>
+                        )}
+                      </>
+                    )}
+                    
+                    {getVisiblePages(currentPage[activeTab] || 1, getTotalPages(calculatedScores[activeTab])).map((page) => (
+                      <button
+                        key={page}
+                        onClick={() => handlePageChange(page)}
+                        className={`px-3 py-2 text-sm font-medium rounded-md ${
+                          (currentPage[activeTab] || 1) === page
+                            ? 'bg-blue-600 text-white'
+                            : 'text-gray-600 bg-white border border-gray-300 hover:bg-gray-50'
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    ))}
+                    
+                    {/* Show ellipsis if there are pages after visible range */}
+                    {getVisiblePages(currentPage[activeTab] || 1, getTotalPages(calculatedScores[activeTab])).slice(-1)[0] < getTotalPages(calculatedScores[activeTab]) && (
+                      <>
+                        {getVisiblePages(currentPage[activeTab] || 1, getTotalPages(calculatedScores[activeTab])).slice(-1)[0] < getTotalPages(calculatedScores[activeTab]) - 1 && (
+                          <span className="px-2 py-2 text-sm text-gray-500">...</span>
+                        )}
+                        <button
+                          onClick={() => handlePageChange(getTotalPages(calculatedScores[activeTab]))}
+                          className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 hover:bg-gray-50 rounded-md"
+                        >
+                          {getTotalPages(calculatedScores[activeTab])}
+                        </button>
+                      </>
+                    )}
+                    
+                    <button
+                      onClick={() => handlePageChange((currentPage[activeTab] || 1) + 1)}
+                      disabled={(currentPage[activeTab] || 1) >= getTotalPages(calculatedScores[activeTab])}
+                      className="px-3 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Next
+                    </button>
+                  </div>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12 text-gray-500">
               No programmes available for this university
@@ -928,6 +1096,17 @@ export default function SortingHatForm() {
           </Card>
           {data && (
             <>
+            {data.hasGrades && data.calculatedScores && data.selectedUniversities && (
+              <Card>
+                <CardContent className="pt-6">
+                  <h2 className="text-2xl font-bold mb-4">Detailed Score Breakdown</h2>
+                  <ScoreBreakdownTabs 
+                    calculatedScores={data.calculatedScores}
+                    selectedUniversities={data.selectedUniversities}
+                  />
+                </CardContent>
+              </Card>
+            )}
               <Card ref={generatedContentRef}>
                 <CardContent className="grid gap-4 pt-6">
                   <h2 className="text-2xl font-bold">AI Recommendations</h2>
@@ -947,17 +1126,6 @@ export default function SortingHatForm() {
                 </CardContent>
               </Card>
 
-              {data.hasGrades && data.calculatedScores && data.selectedUniversities && (
-                <Card>
-                  <CardContent className="pt-6">
-                    <h2 className="text-2xl font-bold mb-4">Detailed Score Breakdown</h2>
-                    <ScoreBreakdownTabs 
-                      calculatedScores={data.calculatedScores}
-                      selectedUniversities={data.selectedUniversities}
-                    />
-                  </CardContent>
-                </Card>
-              )}
             </>
           )}
         </div>

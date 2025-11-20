@@ -454,7 +454,7 @@ export default function TestCalculatorPage() {
         name: string;
         faculty?: string;
       };
-      expectedScore?: number;
+      expectedScore?: number | null;
       method?: string;
     };
     totalScore: number;

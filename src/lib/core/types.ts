@@ -22,7 +22,7 @@ export interface ProgrammeDetails {
 export interface ProgrammeEntry {
     programmeDetails: ProgrammeDetails;
     method?: string;
-    expectedScore?: number;
+    expectedScore?: number | null;
     otherRequirements?: string[];
     calculation?: {
         conditions: {

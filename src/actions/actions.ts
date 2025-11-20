@@ -4,8 +4,15 @@ import { calculateUniversityScores } from "@/lib/calculators/scoreCalculator";
 import { allUniversities } from "@/lib/data/universities";
 import { env } from "process";
 
-const OLLAMA_HOST = env.OLLAMA_HOST;
-const OLLAMA_MODEL = env.OLLAMA_MODEL; // Change as needed
+const OLLAMA_HOST = env.OLLAMA_HOST || 'http://10.64.101.147:11434';
+const OLLAMA_MODEL = env.OLLAMA_MODEL || 'llama4:16x17b'; // Change as needed
+
+if (!env.OLLAMA_HOST) {
+    console.warn('OLLAMA_HOST environment variable not set');
+}
+if (!env.OLLAMA_MODEL) {
+    console.warn('OLLAMA_MODEL environment variable not set');
+}
 
 
 function countTokens(text: string): number {
@@ -133,7 +140,7 @@ interface ProgrammeScore {
             name: string;
             faculty?: string;
         };
-        expectedScore?: number;
+        expectedScore?: number | null;
         method?: string;
     };
     totalScore: number;
@@ -188,34 +195,35 @@ export async function submitSortingHatForm(data: {
     personalityType: string,
     additionalNotes: string
 }): Promise<State> {
-    console.log("Received form data:", data);
+    try {
+        console.log("Received form data:", data);
 
-    // Determine which universities to process
-    const selectedUniversities: University[] = data.universityPreference 
-        ? data.universities 
-        : (Object.keys(allUniversities) as University[]);
+        // Determine which universities to process
+        const selectedUniversities: University[] = data.universityPreference 
+            ? data.universities 
+            : (Object.keys(allUniversities) as University[]);
 
-    console.log("Selected universities:", selectedUniversities);
+        console.log("Selected universities:", selectedUniversities);
 
-    // Collect all subjects with grades (filter out empty grades)
-    const allSubjects = [
-        ...data.subjectsCore,
-        ...data.subjectsElective,
-        ...data.subjectsB,
-        ...data.subjectsC
-    ].filter(subject => subject.grade && subject.grade.trim() !== '');
+        // Collect all subjects with grades (filter out empty grades)
+        const allSubjects = [
+            ...data.subjectsCore,
+            ...data.subjectsElective,
+            ...data.subjectsB,
+            ...data.subjectsC
+        ].filter(subject => subject.grade && subject.grade.trim() !== '');
 
-    console.log("Subjects with grades:", allSubjects.length);
+        console.log("Subjects with grades:", allSubjects.length);
 
-    // Calculate scores if student has provided grades
-    let calculatedScores: UniversityScores | undefined = undefined;
-    const hasGrades = allSubjects.length > 0;
+        // Calculate scores if student has provided grades
+        let calculatedScores: UniversityScores | undefined = undefined;
+        const hasGrades = allSubjects.length > 0;
 
-    if (hasGrades) {
-        console.log("Calculating scores for subjects...");
-        calculatedScores = calculateUniversityScores(selectedUniversities, allSubjects);
-        console.log("Scores calculated successfully");
-    }
+        if (hasGrades) {
+            console.log("Calculating scores for subjects...");
+            calculatedScores = calculateUniversityScores(selectedUniversities, allSubjects);
+            console.log("Scores calculated successfully");
+        }
 
     // Build available programmes list for each selected university
     const availableProgrammes: Record<string, Array<{
@@ -223,7 +231,7 @@ export async function submitSortingHatForm(data: {
         name: string;
         faculty?: string;
         method?: string;
-        expectedScore?: number;
+        expectedScore?: number | null;
         calculatedScore: number | null;
         csdStatus: string | null;
         comments: Comment[] | null;
@@ -255,27 +263,26 @@ export async function submitSortingHatForm(data: {
 
     // Build comprehensive prompt
     const prompt = `
-You are an expert university admissions counselor for Hong Kong universities. You are helping a secondary school student find suitable degree programmes.
+You are a university admissions counselor. Analyze this student's profile and provide personalized programme recommendations. Address the student directly and focus solely on recommending suitable degree programmes.
 
-## STUDENT PROFILE:
+## YOUR PROFILE:
 - **Career Goal**: ${data.career}${data.career === "Other" ? ` (${data.otherCareer})` : ''}
 - **Current Year**: ${data.currentYear}
-- **MBTI Personality Type**: ${data.personalityType}
+- **Personality Type**: ${data.personalityType}
 - **Preferred Disciplines**: ${data.disciplinePreference ? data.disciplines.join(', ') : 'No specific preference'}
 - **Interests/Hobbies**: ${data.interests.join(', ')}${data.otherInterests ? `, ${data.otherInterests}` : ''}
-- **Additional Notes**: ${data.additionalNotes || 'None'}
+- **Additional Notes**: ${data.additionalNotes || 'None provided'}
 
-${hasGrades ? `## ACADEMIC PERFORMANCE:
-The student has provided their HKDSE grades:
+${hasGrades ? `## YOUR HKDSE PERFORMANCE:
+Here are your HKDSE grades:
 ${allSubjects.map(s => `- ${s.subject} (${s.abbreviation}): ${s.grade}`).join('\n')}
 
-### CALCULATED ADMISSION SCORES:
-Based on these grades, we've calculated admission scores for each programme. Higher scores indicate better chances of admission.
-` : `## ACADEMIC PERFORMANCE:
-The student has not yet taken their HKDSE exams or has not provided grades. Please provide general guidance based on their interests and career goals.
+Based on your grades, I've calculated your admission scores for each programme. Higher scores indicate better admission chances.
+` : `## YOUR ACADEMIC JOURNEY:
+Since you haven't taken your HKDSE exams yet, I'll focus on programmes that align with your interests and career goals.
 `}
 
-## AVAILABLE PROGRAMMES BY UNIVERSITY:
+## AVAILABLE PROGRAMMES:
 
 ${selectedUniversities.map(uniKey => {
     const uniName = uniKey.toUpperCase();
@@ -285,9 +292,9 @@ ${selectedUniversities.map(uniKey => {
 ${programmes.slice(0, 20).map((prog) => {
     let progInfo = `- **${prog.code}** - ${prog.name}${prog.faculty ? ` (${prog.faculty})` : ''}`;
     if (hasGrades && prog.calculatedScore !== null) {
-        progInfo += `\n  Score: ${prog.calculatedScore.toFixed(1)}/${prog.expectedScore || 'N/A'}`;
+        progInfo += `\n  Your Score: ${prog.calculatedScore.toFixed(1)}/${prog.expectedScore || 'N/A'}`;
         if (prog.comments && prog.comments.length > 0) {
-            progInfo += ` | Issues: ${prog.comments.map((c) => c.message).join('; ')}`;
+            progInfo += ` | Notes: ${prog.comments.map((c) => c.message).join('; ')}`;
         }
     } else if (prog.expectedScore) {
         progInfo += `\n  Expected Score: ${prog.expectedScore}`;
@@ -297,40 +304,33 @@ ${programmes.slice(0, 20).map((prog) => {
 ${programmes.length > 20 ? `... and ${programmes.length - 20} more programmes` : ''}`;
 }).join('\n\n')}
 
-## YOUR TASK:
-Analyze the student's profile and ${hasGrades ? 'calculated scores to ' : ''}recommend the **TOP 5 PROGRAMMES** that best match their:
-1. Career aspirations
-2. ${hasGrades ? 'Academic performance/scores' : 'Interests and potential fit'}
-3. Personality type and interests
-4. Discipline preferences
+## YOUR TOP 5 PROGRAMME RECOMMENDATIONS:
 
-For each recommendation, provide:
+Based on your career goals, ${hasGrades ? 'academic performance, ' : ''}interests, and personality type, here are my top 5 programme recommendations for you:
+
+For each programme, I'll provide:
 1. **Programme Code & Name** (University)
-2. **Why It's a Good Match**: Explain how it aligns with their career goals, ${hasGrades ? 'scores, ' : ''}interests, and personality
-3. ${hasGrades ? '**Admission Likelihood**: Based on their calculated score vs expected score' : '**What They Should Focus On**: Academic subjects/skills to develop'}
-4. **Career Prospects**: Potential career paths after graduation
-5. **Programme Highlights**: Key features, unique opportunities, or strengths
+2. **Why It Matches You**: How it aligns with your goals, ${hasGrades ? 'scores, ' : ''}interests, and personality
+3. ${hasGrades ? '**Your Admission Chances**: Based on your calculated score' : '**What You Should Focus On**: Academic preparation needed'}
+4. **Career Opportunities**: Where this programme can take you
+5. **Programme Strengths**: What makes this programme special
 
 ${hasGrades ? `
-IMPORTANT SCORING CONTEXT:
-- Scores are calculated based on JUPAS admission criteria (Best 5/6 subjects method)
-- A score close to or above the "Expected Score" indicates good chances
-- Consider CSD status (Attained/Not Attained) - most programmes require "Attained"
-- Warning/error comments indicate potential eligibility issues
+Note about your scores: These are based on JUPAS admission criteria. Scores close to or above the expected score indicate good admission chances. Most programmes require CSD "Attained" status.
 ` : ''}
 
-Please structure your response clearly with headings for each recommendation. Be encouraging but realistic about admission prospects.`;
+Let me recommend the best programmes for you:`;
     const startTime = Date.now();
 
     const inference = await streamInference(OLLAMA_HOST, OLLAMA_MODEL, prompt);
 
     const endTime = Date.now();
     const elapsedTime = (endTime - startTime) / 1000; // Convert to seconds
-    const tokensPerSecond = inference!.numOfTokens ? inference!.numOfTokens / elapsedTime : 0;
+    const tokensPerSecond = inference?.numOfTokens ? inference.numOfTokens / elapsedTime : 0;
 
     const summary = {
         totalExecutionTime: elapsedTime,
-        numberOfTokens: inference!.numOfTokens,
+        numberOfTokens: inference?.numOfTokens || 0,
         speed: tokensPerSecond,
         generatedText: inference?.generatedText,
     };
@@ -345,4 +345,17 @@ Please structure your response clearly with headings for each recommendation. Be
         hasGrades,
         selectedUniversities
     };
+    } catch (error) {
+        console.error("Error in submitSortingHatForm:", error);
+        return {
+            success: false,
+            message: error instanceof Error ? error.message : "An unexpected error occurred",
+            data: {
+                totalExecutionTime: 0,
+                numberOfTokens: 0,
+                speed: 0,
+                generatedText: undefined
+            }
+        };
+    }
 }
